@@ -1,26 +1,39 @@
+"use client";
+
 import BoardList from "@/components/BoardList";
 import { AiFillAppstore } from "react-icons/ai";
+import { getLocalStorageUuid } from "@/app/identification";
+import { useEffect, useState } from "react";
 
-async function getBoards() {
-  try {
-    const boards = await fetch(`${process.env.APP_URL_API}boards`, {
-      cache: "no-cache",
-    });
+export default function Home() {
+  const [boards, setBoards] = useState([]);
 
-    if (!boards.ok) {
-      throw new Error("Failed to fetch boards");
-    }
+  useEffect(() => {
+    const fetchBoards = async () => {
+      const uuid = getLocalStorageUuid(); // Retrieve UUID on the client
+      try {
+        const response = await fetch(`/api/boards`, {
+          cache: "no-cache",
+          headers: {
+            "syncboard_uuid": uuid,
+          },
+          method: "GET",
+        });
 
-    return boards.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
+        if (!response.ok) {
+          throw new Error("Failed to fetch boards");
+        }
 
-export default async function Home() {
+        const data = await response.json();
+        console.log(data.boards);
+        setBoards(data.boards);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  const {boards} = await getBoards();
-  console.log(boards);
+    fetchBoards();
+  }, []);
 
   return (
     <div className="max-w-[1200px] mx-auto mt-8">
@@ -28,10 +41,19 @@ export default async function Home() {
         <AiFillAppstore />
         All Sync Boards
       </h1>
-      {boards.reverse().map((board)=>{
+      {boards.reverse().map((board) => {
         return (
-          <BoardList key={board._id} id={board._id} title={board.title} content={board.content} updated={board.updatedAt}/>
-        )
+          <BoardList
+            key={board._id}
+            id={board._id}
+            title={board.title}
+            content={board.content}
+            updated={board.updatedAt}
+            user={board.user}
+            isProtected={board.isProtected}
+            password={board.pin}
+          />
+        );
       })}
     </div>
   );

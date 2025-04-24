@@ -10,6 +10,18 @@ const boardSchema = new Schema(
       type: String,
       required: true,
     },
+    isProtected: {
+      type: Boolean,
+      default: false,
+    },
+    pin: {
+      type: String,
+      default: "000000",
+    },
+    user: {
+      type: String,
+      default: "Anonymous",
+    },
   },
   {
     timestamps: true,

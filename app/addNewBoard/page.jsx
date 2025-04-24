@@ -4,11 +4,13 @@ import Success from "@/components/Success";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { AiTwotoneThunderbolt } from "react-icons/ai";
+import { getLocalStorageUuid } from "@/app/identification";
 
 export default function addNewBoard() {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
+  const [isProtected, setIsProtected] = useState(false);
   const [success, setSuccess] = useState("");
 
   const router = useRouter();
@@ -35,10 +37,13 @@ export default function addNewBoard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "syncboard_uuid": getLocalStorageUuid(),
         },
         body: JSON.stringify({
           title,
           content,
+          isProtected,
+          user: getLocalStorageUuid(),
         }),
       });
 
@@ -49,7 +54,7 @@ export default function addNewBoard() {
 
       if (res.ok) {
         router.push("/addNewBoard");
-        setSuccess("Board Created Successfuly");
+        setSuccess("Board Created Successfully");
         setTitle("");
         setContent("");
       }
@@ -124,6 +129,19 @@ export default function addNewBoard() {
             value={title}
           />
         </div>
+
+        <div className="flex items-center gap-2 mt-4">
+          <input
+            type="checkbox"
+            id="isProtected"
+            className="w-4 h-4 border-2 border-slate-300 rounded-md"
+            onChange={(e) => setIsProtected(e.target.checked)}
+          />
+          <label htmlFor="isProtected" className="text-slate-900 font-semibold">
+            Is Protected
+          </label>
+        </div>
+
         <div className="flex gap-2 mt-4">
           <button
             type="submit"

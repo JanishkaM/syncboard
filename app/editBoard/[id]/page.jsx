@@ -18,6 +18,7 @@ export default function editBoard({ params }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            "syncboard_uuid": localStorage.getItem("syncboard_uuid"),
           },
           cache: "no-cache",
         });
@@ -70,7 +71,7 @@ export default function editBoard({ params }) {
       }
 
       if (res.ok) {
-        setSuccess("Board Updated Successfuly");
+        setSuccess("Board Updated Successfully");
       }
     } catch (error) {
       console.error;
